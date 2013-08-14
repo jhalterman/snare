@@ -1,12 +1,12 @@
-# snare
+# Snare
 
 *For snaring rabbits and such*
 
-Snare is a simple tool for consuming messages from a RabbitMQ queue.
+A simple tool for consuming messages from a RabbitMQ queue.
 
 ## Setup
 
-To compile via Leiningen:
+Compile it:
 
 ```
 lein uberjar
@@ -14,7 +14,7 @@ lein uberjar
 
 ## Usage
 
-To run Snare:
+Run it:
 
 ```
 java -jar target/snare-0.1.0-SNAPSHOT-standalone.jar
@@ -36,6 +36,6 @@ Supported arguments:
 
 ## License
 
-Copyright © 2013 FIXME
+Copyright © 2013 Jonathan Halterman
 
 Distributed under the Eclipse Public License, the same as Clojure.
