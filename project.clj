@@ -7,4 +7,5 @@
                  [com.rabbitmq/amqp-client "3.1.4"] 
                  [org.clojure/tools.cli "0.2.4"]
                  [clj-yaml "0.4.0"]]
+  :uberjar-name "snare.jar"
   :main snare.core)

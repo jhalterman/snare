@@ -4,7 +4,7 @@
 
 A simple tool for consuming messages from a RabbitMQ queue.
 
-## Setup
+## The Gist
 
 Compile it:
 
@@ -12,12 +12,10 @@ Compile it:
 lein uberjar
 ```
 
-## Usage
-
 Run it:
 
 ```
-java -jar target/snare-0.1.0-SNAPSHOT-standalone.jar
+java -jar target/snare.jar
 ```
 
 Supported arguments:
