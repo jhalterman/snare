@@ -1,0 +1,11 @@
+.cache
+.classpath
+.project
+.settings/
+pom.xml
+*jar
+/lib/
+/classes/
+/targets/
+.lein*
+target/
