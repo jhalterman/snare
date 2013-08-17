@@ -22,8 +22,9 @@ Supported arguments:
 
 ```
  Switches          Default  Desc                          
- --------          -------  ----                          
- -h, --host                 Host                          
+ --------          -------  ----
+ -f, --file                 Properties file                    
+ -h, --host                 Host                         
  --port            5672     Port                          
  -u, --username             Username                      
  -p, --password             Password                      

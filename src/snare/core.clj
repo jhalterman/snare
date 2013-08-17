@@ -6,11 +6,13 @@
   (:require [clj-yaml.core :as yaml])
   (:import [com.rabbitmq.client ConnectionFactory QueueingConsumer]))
 
+(declare readOpts)
 (declare consume)
 
 (defn -main [& args]
   (let [[opts args banner]
         (cli args
+             ["-f" "--file" "Properties file"]
              ["-h" "--host" "Host"]
              ["--port" "Port" :default 5672 :parse-fn #(Integer/parseInt %)]
              ["-u" "--username" "Username"]
@@ -18,6 +20,7 @@
              ["-v" "--vhost" "Vhost" :default "/"]
              ["-r" "--routingKey" "Routing key to bind to queue" :default "#"]
              ["-q" "--queue" "Name of queue to consume from"])
+        opts (readOpts opts)
         missingOpts (key-diff opts [:host :port :vhost :username :password :routingKey :queue])]
     (if (empty? missingOpts)
       (consume opts)
@@ -26,18 +29,23 @@
         (apply println (map name missingOpts))
         (println banner)))))
 
-(defn consume [args]
-  (let
-    [cxnFactory (doto (ConnectionFactory.)
-                             (.setHost (:host args))
-                             (.setPort (:port args))
-                             (.setUsername (:username args))
-                             (.setPassword (:password args))
-                             (.setVirtualHost (:vhost args)))
-     connection (. cxnFactory newConnection)
-     connection (. cxnFactory newConnection)
-     channel (. connection createChannel)
-     consumer (QueueingConsumer. channel)]
+(defn- readOpts [args]
+  (let [file (:file args)]
+    (if file
+      (merge args (load-props file))
+      args)))
+
+(defn- consume [args]
+  (let [cxnFactory (doto (ConnectionFactory.)
+                     (.setHost (:host args))
+                     (.setPort (:port args))
+                     (.setUsername (:username args))
+                     (.setPassword (:password args))
+                     (.setVirtualHost (:vhost args)))
+        connection (. cxnFactory newConnection)
+        connection (. cxnFactory newConnection)
+        channel (. connection createChannel)
+        consumer (QueueingConsumer. channel)]
     (.basicConsume channel (:queue args) true consumer)
     (println "Connected...") 
     (loop []

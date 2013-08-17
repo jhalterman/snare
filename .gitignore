@@ -9,3 +9,5 @@ pom.xml
 /targets/
 .lein*
 target/
+*.properties
+bin/
