@@ -43,7 +43,6 @@
                      (.setPassword (:password args))
                      (.setVirtualHost (:vhost args)))
         connection (. cxnFactory newConnection)
-        connection (. cxnFactory newConnection)
         channel (. connection createChannel)
         consumer (QueueingConsumer. channel)]
     (.basicConsume channel (:queue args) true consumer)
