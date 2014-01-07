@@ -1,13 +1,5 @@
-.cache
-.classpath
-.project
-.settings/
-pom.xml
-*jar
-/lib/
-/classes/
-/targets/
-.lein*
-target/
+snare.iml
 *.properties
-bin/
+.idea/
+.nrepl-port
+target/
