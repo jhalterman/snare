@@ -3,11 +3,29 @@
   (:use [clojure.tools.cli :only (cli)]
         clojure.set
         snare.util)
-  (:require [clj-yaml.core :as yaml])
-  (:import [com.rabbitmq.client ConnectionFactory QueueingConsumer]))
+  (:import [com.rabbitmq.client ConnectionFactory DefaultConsumer]
+           [java.io ByteArrayInputStream DataInputStream]))
 
-(declare readOpts)
-(declare consume)
+(defn- read-opts [args]
+  (let [file (:file args)]
+    (if file
+      (merge args (load-props file))
+      args)))
+
+(defn- consume [args]
+  (let [cxn-factory (doto (ConnectionFactory.)
+                      (.setHost (:host args))
+                      (.setPort (:port args))
+                      (.setUsername (:username args))
+                      (.setPassword (:password args))
+                      (.setVirtualHost (:vhost args)))
+        connection (.newConnection cxn-factory)
+        channel (.createChannel connection)
+        consumer (proxy [DefaultConsumer] [channel]
+                   (handleDelivery [consumerTag envelope properties body]
+                     (println (String. body))))]
+    (.basicConsume channel (:queue args) true consumer)
+    (println "Connected...")))
 
 (defn -main [& args]
   (let [[opts args banner]
@@ -18,37 +36,13 @@
              ["-u" "--username" "Username"]
              ["-p" "--password" "Password"]
              ["-v" "--vhost" "Vhost" :default "/"]
-             ["-r" "--routingKey" "Routing key to bind to queue" :default "#"]
+             ["-r" "--routing-key" "Routing key to bind to queue" :default "#"]
              ["-q" "--queue" "Name of queue to consume from"])
-        opts (readOpts opts)
-        missingOpts (key-diff opts [:host :port :vhost :username :password :routingKey :queue])]
-    (if (empty? missingOpts)
+        opts (read-opts opts)
+        missing-opts (key-diff opts [:host :port :vhost :username :password :routing-key :queue])]
+    (if (empty? missing-opts)
       (consume opts)
       (do
         (print "Missing args: ")
-        (apply println (map name missingOpts))
+        (apply println (map name missing-opts))
         (println banner)))))
-
-(defn- readOpts [args]
-  (let [file (:file args)]
-    (if file
-      (merge args (load-props file))
-      args)))
-
-(defn- consume [args]
-  (let [cxnFactory (doto (ConnectionFactory.)
-                     (.setHost (:host args))
-                     (.setPort (:port args))
-                     (.setUsername (:username args))
-                     (.setPassword (:password args))
-                     (.setVirtualHost (:vhost args)))
-        connection (. cxnFactory newConnection)
-        channel (. connection createChannel)
-        consumer (QueueingConsumer. channel)]
-    (.basicConsume channel (:queue args) true consumer)
-    (println "Connected...") 
-    (loop []
-      (let [delivery (. consumer nextDelivery)
-            body (String. (. delivery getBody))]
-        (println body)
-        (recur)))))
